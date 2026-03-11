@@ -47,9 +47,12 @@ public class PedidoController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Pedido> atualizar(@PathVariable Long id, @RequestBody Pedido pedidoAtualizado) {
-        System.err.println("Atualizando pedido ID " + id + " com dados: " + pedidoAtualizado);
-        Pedido pedido = pedidoService.atualizar(id, pedidoAtualizado);
+    public ResponseEntity<Pedido> atualizar(
+        @PathVariable Long id, 
+        @RequestBody Pedido pedidoAtualizado, 
+        @RequestParam(name = "deveEstornar") boolean deveEstornar) {
+        System.err.println("Atualizando pedido ID " + id + " parametro: " + deveEstornar);
+        Pedido pedido = pedidoService.atualizar(id, pedidoAtualizado, deveEstornar);
         return ResponseEntity.ok(pedido);
     }
     
@@ -59,9 +62,4 @@ public class PedidoController {
         return ResponseEntity.ok().build();
     }
     
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        pedidoService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pratos")
@@ -51,4 +53,6 @@ public class Prato {
     protected void onUpdate() {
         atualizadoEm = LocalDateTime.now();
     }
+    @OneToMany(mappedBy = "prato", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PratoInsumo> ingredientes = new ArrayList<>();
 }

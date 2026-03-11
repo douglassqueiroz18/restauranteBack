@@ -52,4 +52,5 @@ public class ItensPedido {
             subtotal = precoUnitario.multiply(new BigDecimal(quantidade));
         }
     }
+    private String status;
 }
