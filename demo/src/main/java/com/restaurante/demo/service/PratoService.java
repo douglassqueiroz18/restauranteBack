@@ -60,6 +60,7 @@ public class PratoService {
                 prato.setEstoque(pratoAtualizado.getEstoque());
                 prato.setCategoria(pratoAtualizado.getCategoria());
                 prato.setAtivo(pratoAtualizado.getAtivo());
+                prato.setFotoUrl(pratoAtualizado.getFotoUrl());
                 if (pratoAtualizado.getIngredientes() != null) {
                     prato.getIngredientes().clear();
                     pratoAtualizado.getIngredientes().forEach(novoItem -> {

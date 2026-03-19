@@ -2,11 +2,14 @@ package com.restaurante.demo.controller;
 
 import com.restaurante.demo.entity.Prato;
 import com.restaurante.demo.service.PratoService;
+import com.restaurante.demo.service.StorageService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pratos")
@@ -15,7 +18,7 @@ import java.util.List;
 public class PratoController {
     
     private final PratoService pratoService;
-    
+    private final StorageService storageService;
     @GetMapping
     public ResponseEntity<List<Prato>> listarTodos() {
         return ResponseEntity.ok(pratoService.listarTodos());
@@ -52,6 +55,7 @@ public class PratoController {
     @PutMapping("/{id}")
     public ResponseEntity<Prato> atualizar(@PathVariable Long id, @RequestBody Prato pratoAtualizado) {
         Prato prato = pratoService.atualizar(id, pratoAtualizado);
+        System.out.println("pegando dado da foto: " + pratoAtualizado.getFotoUrl());
         return ResponseEntity.ok(prato);
     }
     
@@ -59,5 +63,13 @@ public class PratoController {
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         pratoService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/upload-url")
+    public ResponseEntity<Map<String, String>> getUploadUrl(
+        @RequestParam String nomeArquivo, 
+        @RequestParam String contentType) {
+    
+    String url = storageService.gerarPresignedUrl(nomeArquivo, contentType);
+    return ResponseEntity.ok(Map.of("url", url));
     }
 }

@@ -43,14 +43,11 @@ public class PedidoService {
         item.getPrato().getIngredientes().forEach(ingrediente -> {
             Insumo insumo = ingrediente.getInsumo();
             
-            // Valor vindo da ficha técnica (ex: 300)
             Double qtdNecessaria = ingrediente.getQuantidadeNecessaria();
             
-            // Unidades envolvidas
-            String unidadeFicha = ingrediente.getUnidadeMedida(); // Ex: "G"
-            String unidadeEstoque = insumo.getUnidadeMedida();   // Ex: "KG"
+            String unidadeFicha = ingrediente.getUnidadeMedida();
+            String unidadeEstoque = insumo.getUnidadeMedida(); 
 
-            // Converter a quantidade necessária para a unidade do estoque
             Double qtdConvertida = converterParaUnidadeEstoque(qtdNecessaria, unidadeFicha, unidadeEstoque);
 
             Double quantidadeTotalGasta = qtdConvertida * item.getQuantidade();
@@ -71,17 +68,14 @@ public class PedidoService {
             return valor;
         }
 
-        // Se a ficha técnica diz "G" (gramas) e o estoque está em "KG" (quilos)
         if (de.equalsIgnoreCase("G") && para.equalsIgnoreCase("KG")) {
             return valor / 1000.0;
         }
 
-        // Se a ficha técnica diz "ML" (mililitros) e o estoque está em "L" (litros)
         if (de.equalsIgnoreCase("ML") && para.equalsIgnoreCase("L")) {
             return valor / 1000.0;
         }
 
-        // O inverso também é importante prevenir
         if (de.equalsIgnoreCase("KG") && para.equalsIgnoreCase("G")) {
             return valor * 1000.0;
         }
@@ -97,7 +91,6 @@ public class PedidoService {
         if (item.getPrato() != null && item.getPrato().getIngredientes() != null) {        
             item.getPrato().getIngredientes().forEach(ingrediente -> {
             Insumo insumo = ingrediente.getInsumo();
-            // CONVERSÃO É ESSENCIAL AQUI TAMBÉM
             Double qtdConvertida = converterParaUnidadeEstoque(
                 ingrediente.getQuantidadeNecessaria(), 
                 ingrediente.getUnidadeMedida(), 
@@ -132,8 +125,6 @@ public class PedidoService {
             StatusPedido statusAntigo = pedido.getStatus();
             StatusPedido statusNovo = pedidoAtualizado.getStatus();
             if (deveRetornar && statusAntigo != StatusPedido.CANCELADO) {
-                // Criamos uma cópia da lista apenas para o loop de estorno
-                // Isso evita que o Hibernate se perca se a lista for alterada durante o processo
                 List<ItensPedido> itensParaEstornar = new ArrayList<>(pedido.getItens());
                 itensParaEstornar.forEach(this::estornarEstoqueDosIngredientes);
             }
@@ -148,7 +139,6 @@ public class PedidoService {
                 pedidoAtualizado.getItens().forEach(item -> {
                     item.setPedido(pedido);
                     
-                    // Baixa o estoque do item novo/atualizado
                     if (statusNovo != StatusPedido.CANCELADO) {
                         baixarEstoqueDosIngredientes(item); 
                     }

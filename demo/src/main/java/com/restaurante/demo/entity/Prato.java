@@ -42,7 +42,9 @@ public class Prato {
     
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
-    
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     @PrePersist
     protected void onCreate() {
         criadoEm = LocalDateTime.now();
