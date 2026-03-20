@@ -4,6 +4,7 @@ import com.restaurante.demo.entity.Prato;
 import com.restaurante.demo.repository.PratoRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+
+import javax.management.RuntimeErrorException;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +77,27 @@ public class PratoService {
     }
     
     public void deletar(Long id) {
-        pratoRepository.deleteById(id);
+        Prato prato = pratoRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prato não encontrado"));
+
+        if (pratoRepository.countPedidosAtivosComEstePrato(id) > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, 
+                "Este prato não pode ser excluído pois está em um pedido sendo preparado ou entregue.");
+        }
+        boolean temHistorico = pratoRepository.existsVinculoComItensPedido(id);
+        if (temHistorico) {
+        prato.setAtivo(false);
+        pratoRepository.save(prato);
+        System.out.println("Prato " + id + " desativado (Soft Delete) com sucesso.");
+        } else {
+        try {
+            pratoRepository.delete(prato);
+            pratoRepository.flush();
+            System.out.println("Prato " + id + " excluído permanentemente.");
+        } catch (DataIntegrityViolationException e) {
+            prato.setAtivo(false);
+            pratoRepository.save(prato);
+        }
+    }
     }
 }
